@@ -3,8 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Glovo Calculator</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body style="text-align:center; font-family: Arial; margin-top:50px;">
-    <h1>Працює ✅</h1>
+<body style="font-family: Arial; text-align:center; padding:20px;">
+
+    <h2>💰 Glovo Калькулятор</h2>
+
+    <input id="start" placeholder="Початок (10:00)"><br><br>
+    <input id="end" placeholder="Кінець (18:00)"><br><br>
+    <input id="money" placeholder="Заробіток (zl)"><br><br>
+
+    <button onclick="calc()">Розрахувати</button>
+
+    <p id="result"></p>
+
+    <script>
+        function calc() {
+            let start = document.getElementById("start").value;
+            let end = document.getElementById("end").value;
+            let money = parseFloat(document.getElementById("money").value);
+
+            let s = start.split(":");
+            let e = end.split(":");
+
+            let hours = (e[0] - s[0]) + (e[1] - s[1]) / 60;
+
+            let hourly = money / hours;
+            let finalMoney = money - 30;
+
+            document.getElementById("result").innerHTML =
+                "⏱ Години: " + hours.toFixed(2) + "<br>" +
+                "💸 zl/год: " + hourly.toFixed(2) + "<br>" +
+                "🚴 Після оренди: " + finalMoney.toFixed(2);
+        }
+    </script>
+
 </body>
 </html>
