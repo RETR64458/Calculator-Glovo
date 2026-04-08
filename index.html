@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glovo Rider Mini</title>
+<title>Glovo Rider Red</title>
 
 <style>
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #020617, #0f172a);
+  background: linear-gradient(180deg, #1a0000, #0a0000);
   color: white;
 }
 
@@ -20,12 +20,11 @@ body {
 }
 
 .card {
-  background: rgba(15,23,42,0.7);
-  backdrop-filter: blur(20px);
+  background: rgba(40,0,0,0.7);
+  backdrop-filter: blur(18px);
   padding: 20px;
   border-radius: 26px;
-  margin-bottom: 15px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+  box-shadow: 0 25px 60px rgba(255,0,0,0.25);
 }
 
 h3 {
@@ -39,7 +38,7 @@ input {
   margin: 6px 0 10px;
   border-radius: 16px;
   border: none;
-  background: #1e293b;
+  background: #2a0a0a;
   color: white;
   font-size: 15px;
 }
@@ -57,18 +56,13 @@ button {
   margin-top: 12px;
   font-weight: bold;
   font-size: 16px;
-  background: linear-gradient(135deg, #22c55e, #4ade80);
-  color: #022c22;
-  transition: 0.2s;
-}
-
-button:active {
-  transform: scale(0.96);
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: white;
 }
 
 .result {
   margin-top: 16px;
-  background: #020617;
+  background: #0a0000;
   padding: 16px;
   border-radius: 18px;
   font-size: 15px;
@@ -78,12 +72,10 @@ button:active {
   display: flex;
   justify-content: space-between;
   padding: 6px 0;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid #3f1d1d;
 }
 
-.resultLine:last-child {
-  border-bottom: none;
-}
+.resultLine:last-child { border-bottom: none; }
 
 .green { color: #4ade80; }
 .blue { color: #60a5fa; }
@@ -91,17 +83,17 @@ button:active {
 
 .copyBox {
   margin-top: 14px;
-  background: #020617;
+  background: #0a0000;
   padding: 14px;
   border-radius: 18px;
-  font-size: 13px;
-  border: 1px solid #1e293b;
+  font-size: 14px;
+  border: 1px solid #3f1d1d;
 }
 
 .copyBtn {
   margin-top: 10px;
   width: 100%;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  background: linear-gradient(135deg, #dc2626, #ef4444);
   border: none;
   padding: 10px;
   border-radius: 12px;
@@ -118,7 +110,7 @@ button:active {
 
 .label {
   font-size: 12px;
-  opacity: 0.6;
+  opacity: 0.7;
   margin-top: 8px;
 }
 
@@ -130,7 +122,7 @@ button:active {
 <div class="container">
 
   <div class="card">
-    <h3>🚴 Робочий день</h3>
+    <h3>🔥 Робочий день</h3>
 
     <input type="date" id="date">
 
@@ -214,7 +206,7 @@ function calc() {
 
   let breakText = (breakStart && breakEnd)
     ? `${breakStart}-${breakEnd}`
-    : "Без перерыва";
+    : "Без перерви";
 
   document.getElementById("result").innerHTML = `
     <div class="resultLine"><span>💰 Чистий</span><span class="green">${net} zl</span></div>
@@ -224,8 +216,14 @@ function calc() {
     <div class="resultLine"><span>🏦 Банк</span><span class="blue">${bankPaid} zl</span></div>
   `;
 
-  let copyString =
-`${formatDateLabel(date)} | ${start}-${end} | ${breakText} | ${net} zl | ${cashPaid} zl | ${bankPaid} zl`;
+  let copyString = `📅 ${formatDateLabel(date)}\n` +
+`⏰ ${start} - ${end}\n` +
+`☕ ${breakText}\n\n` +
+`💰 Чистий\n${net} zl\n` +
+`🚲 Оренда\n-30 zl\n` +
+`⏱ За годину\n${hourly} zl\n` +
+`💵 Готівка\n${cashPaid} zl\n` +
+`🏦 Банк\n${bankPaid} zl`;
 
   document.getElementById("copyText").innerText = copyString;
   document.getElementById("copyBox").style.display = "block";
@@ -233,7 +231,6 @@ function calc() {
 
 function copyText() {
   let text = document.getElementById("copyText").innerText;
-
   navigator.clipboard.writeText(text).then(() => {
     let el = document.getElementById("copySuccess");
     el.style.display = "block";
