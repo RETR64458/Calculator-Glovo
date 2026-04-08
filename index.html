@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: radial-gradient(circle at top, #1e293b, #020617);
+  background: linear-gradient(180deg, #020617, #0f172a);
   color: white;
 }
 
@@ -20,21 +20,24 @@ body {
 }
 
 .card {
-  background: rgba(15,23,42,0.8);
-  backdrop-filter: blur(16px);
-  padding: 18px;
-  border-radius: 24px;
+  background: rgba(15,23,42,0.7);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 26px;
   margin-bottom: 15px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
 }
 
-h3 { margin-top: 0; }
+h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
 
 input {
   width: 100%;
-  padding: 13px;
+  padding: 14px;
   margin: 6px 0 10px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: none;
   background: #1e293b;
   color: white;
@@ -48,10 +51,10 @@ input {
 
 button {
   width: 100%;
-  padding: 14px;
-  border-radius: 16px;
+  padding: 15px;
+  border-radius: 18px;
   border: none;
-  margin-top: 10px;
+  margin-top: 12px;
   font-weight: bold;
   font-size: 16px;
   background: linear-gradient(135deg, #22c55e, #4ade80);
@@ -60,26 +63,39 @@ button {
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 .result {
-  margin-top: 15px;
+  margin-top: 16px;
   background: #020617;
-  padding: 14px;
-  border-radius: 16px;
-  white-space: pre-line;
+  padding: 16px;
+  border-radius: 18px;
   font-size: 15px;
 }
 
+.resultLine {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.resultLine:last-child {
+  border-bottom: none;
+}
+
+.green { color: #4ade80; }
+.blue { color: #60a5fa; }
+.red { color: #f87171; }
+
 .copyBox {
-  margin-top: 12px;
+  margin-top: 14px;
   background: #020617;
   padding: 14px;
-  border-radius: 16px;
-  font-size: 14px;
-  position: relative;
-  border: 1px solid #334155;
+  border-radius: 18px;
+  font-size: 13px;
+  border: 1px solid #1e293b;
 }
 
 .copyBtn {
@@ -93,17 +109,17 @@ button:active {
   color: white;
 }
 
-.label {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-top: 6px;
-}
-
 .success {
   margin-top: 6px;
   font-size: 12px;
   color: #4ade80;
   display: none;
+}
+
+.label {
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 8px;
 }
 
 </style>
@@ -114,11 +130,11 @@ button:active {
 <div class="container">
 
   <div class="card">
-    <h3>🚴 День</h3>
+    <h3>🚴 Робочий день</h3>
 
     <input type="date" id="date">
 
-    <div class="label">Робота</div>
+    <div class="label">Робочий час</div>
     <div class="row">
       <input type="time" id="start">
       <input type="time" id="end">
@@ -200,13 +216,13 @@ function calc() {
     ? `${breakStart}-${breakEnd}`
     : "Без перерыва";
 
-  let result =
-`💰 ${net} zl
-⏱ ${hourly} zl/год
-💵 ${cashPaid} zl
-🏦 ${bankPaid} zl`;
-
-  document.getElementById("result").innerText = result;
+  document.getElementById("result").innerHTML = `
+    <div class="resultLine"><span>💰 Чистий</span><span class="green">${net} zl</span></div>
+    <div class="resultLine"><span>🚲 Оренда</span><span class="red">-30 zl</span></div>
+    <div class="resultLine"><span>⏱ За годину</span><span>${hourly} zl</span></div>
+    <div class="resultLine"><span>💵 Готівка</span><span class="green">${cashPaid} zl</span></div>
+    <div class="resultLine"><span>🏦 Банк</span><span class="blue">${bankPaid} zl</span></div>
+  `;
 
   let copyString =
 `${formatDateLabel(date)} | ${start}-${end} | ${breakText} | ${net} zl | ${cashPaid} zl | ${bankPaid} zl`;
