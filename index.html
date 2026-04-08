@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #0f172a, #020617);
+  background: radial-gradient(circle at top, #1e293b, #020617);
   color: white;
 }
 
@@ -20,23 +20,23 @@ body {
 }
 
 .card {
-  background: rgba(30,41,59,0.9);
-  backdrop-filter: blur(10px);
+  background: rgba(15,23,42,0.8);
+  backdrop-filter: blur(16px);
   padding: 18px;
-  border-radius: 22px;
+  border-radius: 24px;
   margin-bottom: 15px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
 h3 { margin-top: 0; }
 
 input {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   margin: 6px 0 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: none;
-  background: #334155;
+  background: #1e293b;
   color: white;
   font-size: 15px;
 }
@@ -49,42 +49,47 @@ input {
 button {
   width: 100%;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: none;
   margin-top: 10px;
   font-weight: bold;
   font-size: 16px;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: white;
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: #022c22;
+  transition: 0.2s;
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 .result {
   margin-top: 15px;
   background: #020617;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: 16px;
   white-space: pre-line;
   font-size: 15px;
 }
 
 .copyBox {
-  margin-top: 10px;
-  background: #111827;
-  padding: 12px;
-  border-radius: 12px;
+  margin-top: 12px;
+  background: #020617;
+  padding: 14px;
+  border-radius: 16px;
   font-size: 14px;
   position: relative;
+  border: 1px solid #334155;
 }
 
 .copyBtn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #3b82f6;
+  margin-top: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
   border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 14px;
   color: white;
 }
 
@@ -92,6 +97,13 @@ button {
   font-size: 13px;
   opacity: 0.7;
   margin-top: 6px;
+}
+
+.success {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #4ade80;
+  display: none;
 }
 
 </style>
@@ -102,7 +114,7 @@ button {
 <div class="container">
 
   <div class="card">
-    <h3>🚴 Новий день</h3>
+    <h3>🚴 День</h3>
 
     <input type="date" id="date">
 
@@ -114,8 +126,8 @@ button {
 
     <div class="label">Перерва</div>
     <div class="row">
-      <input type="time" id="breakStart" placeholder="Початок">
-      <input type="time" id="breakEnd" placeholder="Кінець">
+      <input type="time" id="breakStart">
+      <input type="time" id="breakEnd">
     </div>
 
     <input type="number" id="earn" placeholder="Заробіток (zl)">
@@ -126,8 +138,9 @@ button {
     <div class="result" id="result"></div>
 
     <div class="copyBox" id="copyBox" style="display:none;">
-      <button class="copyBtn" onclick="copyText()">Копіювати</button>
       <div id="copyText"></div>
+      <button class="copyBtn" onclick="copyText()">Скопіювати</button>
+      <div class="success" id="copySuccess">✔ Скопійовано</div>
     </div>
 
   </div>
@@ -164,18 +177,15 @@ function calc() {
   let net = earn - rent;
 
   let workMinutes = toMinutes(end) - toMinutes(start);
-  let breakMinutes = 0;
-
-  if (breakStart && breakEnd) {
-    breakMinutes = Math.max(0, toMinutes(breakEnd) - toMinutes(breakStart));
-  }
+  let breakMinutes = (breakStart && breakEnd)
+    ? Math.max(0, toMinutes(breakEnd) - toMinutes(breakStart))
+    : 0;
 
   let realMinutes = Math.max(workMinutes - breakMinutes, 1);
   let hours = realMinutes / 60;
 
   let hourly = (net / hours).toFixed(2);
 
-  // 💰 логика выплат
   let cashPaid = 0;
   let bankPaid = 0;
 
@@ -186,23 +196,20 @@ function calc() {
     bankPaid = net;
   }
 
-  let result =
-`💰 Чистий: ${net} zl
-🚲 Оренда: -30 zl
-⏱ ${hourly} zl/год
+  let breakText = (breakStart && breakEnd)
+    ? `${breakStart}-${breakEnd}`
+    : "Без перерыва";
 
-💵 Готівкою: ${cashPaid} zl
-🏦 Банком: ${bankPaid} zl`;
+  let result =
+`💰 ${net} zl
+⏱ ${hourly} zl/год
+💵 ${cashPaid} zl
+🏦 ${bankPaid} zl`;
 
   document.getElementById("result").innerText = result;
 
   let copyString =
-`${formatDateLabel(date)}
-${start}-${end}
-Перерва: ${breakStart || "-"}-${breakEnd || "-"}
-💰 ${net} zl
-⏱ ${hourly} zl/h
-💵 ${cashPaid} zl | 🏦 ${bankPaid} zl`;
+`${formatDateLabel(date)} | ${start}-${end} | ${breakText} | ${net} zl | ${cashPaid} zl | ${bankPaid} zl`;
 
   document.getElementById("copyText").innerText = copyString;
   document.getElementById("copyBox").style.display = "block";
@@ -210,7 +217,12 @@ ${start}-${end}
 
 function copyText() {
   let text = document.getElementById("copyText").innerText;
-  navigator.clipboard.writeText(text);
+
+  navigator.clipboard.writeText(text).then(() => {
+    let el = document.getElementById("copySuccess");
+    el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 1500);
+  });
 }
 
 </script>
