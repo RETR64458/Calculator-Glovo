@@ -8,7 +8,7 @@
 <style>
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: -apple-system, sans-serif;
   background: #0f172a;
   color: white;
 }
@@ -23,16 +23,7 @@ body {
   background: #1e293b;
   padding: 20px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-
-h2 {
   margin-bottom: 15px;
-}
-
-label {
-  font-size: 13px;
-  opacity: 0.7;
 }
 
 input {
@@ -43,7 +34,6 @@ input {
   border: none;
   background: #334155;
   color: white;
-  font-size: 16px;
 }
 
 button {
@@ -51,26 +41,32 @@ button {
   padding: 14px;
   border-radius: 14px;
   border: none;
-  background: #22c55e;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
   margin-top: 10px;
+  font-weight: bold;
 }
 
+.calc { background: #22c55e; }
+.total { background: #3b82f6; }
+
 .result {
-  margin-top: 15px;
+  margin-top: 10px;
   background: #020617;
-  padding: 15px;
-  border-radius: 15px;
+  padding: 12px;
+  border-radius: 12px;
   white-space: pre-line;
 }
 
-.cash {
-  margin-top: 10px;
+.history {
+  font-size: 14px;
+}
+
+.item {
   padding: 10px;
-  border-radius: 12px;
-  background: #14532d;
+  border-bottom: 1px solid #334155;
+}
+
+.rent {
+  color: #f87171;
 }
 
 </style>
@@ -79,32 +75,48 @@ button {
 <body>
 
 <div class="container">
+
+  <!-- КАЛЬКУЛЯТОР -->
   <div class="card">
-    <h2>🚴 Glovo Rider</h2>
+    <h3>🚴 Новий день</h3>
 
-    <label>Дата</label>
     <input type="date" id="date">
-
-    <label>Початок</label>
     <input type="time" id="start">
-
-    <label>Кінець</label>
     <input type="time" id="end">
+    <input type="number" id="earn" placeholder="Заробіток (zl)">
+    <input type="number" id="cash" placeholder="Готівка (zl)">
 
-    <label>Заробіток (zl)</label>
-    <input type="number" id="earn">
-
-    <label>Готівка (zl)</label>
-    <input type="number" id="cash">
-
-    <button onclick="calc()">Розрахувати</button>
+    <button class="calc" onclick="calc()">Розрахувати</button>
 
     <div class="result" id="result"></div>
-    <div class="cash" id="cashInfo"></div>
   </div>
+
+  <!-- ПОВНИЙ ЗАРОБІТОК -->
+  <div class="card">
+    <button class="total" onclick="total()">💰 Повний заробіток</button>
+    <div class="result" id="totalResult"></div>
+  </div>
+
+  <!-- ІСТОРІЯ -->
+  <div class="card">
+    <h3>📅 Історія</h3>
+    <div class="history" id="history"></div>
+  </div>
+
 </div>
 
 <script>
+
+function formatDateLabel(dateStr) {
+  let today = new Date();
+  let d = new Date(dateStr);
+
+  let diff = Math.floor((today - d) / (1000*60*60*24));
+
+  if (diff === 0) return "Сьогодні";
+  if (diff === 1) return "Вчора";
+  return dateStr;
+}
 
 function calc() {
   let date = document.getElementById("date").value;
@@ -122,37 +134,69 @@ function calc() {
 
   let hourly = (net / hours).toFixed(2);
 
-  let result = "";
   let cashPaid = 0;
+  let cashText = "";
 
   if (cash > 60) {
     cashPaid = Math.min(net, cash - 60);
-    let left = cash - cashPaid;
-
-    result =
-`📅 ${date}
-⏰ ${start} - ${end}
-💰 ${net} zl (-30)
-⏱ ${hourly} zl/год
-💵 Залишок: ${left} zl`;
-
+    cashText = "💵 Виплачено: " + cashPaid + " zl";
   } else {
-    result =
-`📅 ${date}
-⏰ ${start} - ${end}
-💰 ${net} zl (-30)
-⏱ ${hourly} zl/год
-🏦 Виплата на банк`;
+    cashText = "🏦 Банк";
   }
+
+  let result =
+`💰 Чистий: ${net} zl
+🚲 Оренда велосипеда: -30 zl
+⏱ ${hourly} zl/год
+${cashText}`;
 
   document.getElementById("result").innerText = result;
 
-  document.getElementById("cashInfo").innerText =
-    cashPaid > 0
-      ? "💵 Виплачено готівкою: " + cashPaid + " zl"
-      : "";
+  // збереження
+  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
 
+  history.unshift({
+    date,
+    net,
+    rent,
+    hourly,
+    cashPaid
+  });
+
+  localStorage.setItem("glovo_data", JSON.stringify(history));
+
+  renderHistory();
 }
+
+function total() {
+  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
+
+  let sum = history.reduce((acc, item) => acc + item.net, 0);
+
+  document.getElementById("totalResult").innerText =
+    "💰 Загальний заробіток: " + sum + " zl";
+}
+
+function renderHistory() {
+  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
+
+  let html = "";
+
+  history.slice(0, 10).forEach(item => {
+    html += `
+<div class="item">
+<b>${formatDateLabel(item.date)}</b><br>
+💰 ${item.net} zl<br>
+<span class="rent">🚲 -30 zl оренда</span><br>
+⏱ ${item.hourly} zl/год<br>
+💵 ${item.cashPaid} zl
+</div>`;
+  });
+
+  document.getElementById("history").innerHTML = html;
+}
+
+renderHistory();
 
 </script>
 
