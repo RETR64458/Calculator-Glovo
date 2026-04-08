@@ -16,30 +16,34 @@ body {
 .container {
   max-width: 420px;
   margin: auto;
-  padding: 20px;
+  padding: 18px;
 }
 
 .card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 20px;
+  background: rgba(30,41,59,0.9);
+  backdrop-filter: blur(10px);
+  padding: 18px;
+  border-radius: 22px;
   margin-bottom: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-h3 {
-  margin-top: 0;
-}
+h3 { margin-top: 0; }
 
 input {
   width: 100%;
   padding: 12px;
-  margin: 6px 0 12px;
+  margin: 6px 0 10px;
   border-radius: 12px;
   border: none;
   background: #334155;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
 }
 
 button {
@@ -84,6 +88,12 @@ button {
   color: white;
 }
 
+.label {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
 </style>
 </head>
 
@@ -95,8 +105,19 @@ button {
     <h3>🚴 Новий день</h3>
 
     <input type="date" id="date">
-    <input type="time" id="start">
-    <input type="time" id="end">
+
+    <div class="label">Робота</div>
+    <div class="row">
+      <input type="time" id="start">
+      <input type="time" id="end">
+    </div>
+
+    <div class="label">Перерва</div>
+    <div class="row">
+      <input type="time" id="breakStart" placeholder="Початок">
+      <input type="time" id="breakEnd" placeholder="Кінець">
+    </div>
+
     <input type="number" id="earn" placeholder="Заробіток (zl)">
     <input type="number" id="cash" placeholder="Готівка (zl)">
 
@@ -123,44 +144,65 @@ function formatDateLabel(dateStr) {
   return `${day}.${month}.${year}`;
 }
 
+function toMinutes(t) {
+  if (!t) return 0;
+  let [h,m] = t.split(":").map(Number);
+  return h*60 + m;
+}
+
 function calc() {
   let date = document.getElementById("date").value;
   let start = document.getElementById("start").value;
   let end = document.getElementById("end").value;
+  let breakStart = document.getElementById("breakStart").value;
+  let breakEnd = document.getElementById("breakEnd").value;
+
   let earn = Number(document.getElementById("earn").value);
   let cash = Number(document.getElementById("cash").value);
 
   let rent = 30;
   let net = earn - rent;
 
-  let startH = parseInt(start.split(":")[0]);
-  let endH = parseInt(end.split(":")[0]);
-  let hours = Math.max(endH - startH, 1);
+  let workMinutes = toMinutes(end) - toMinutes(start);
+  let breakMinutes = 0;
+
+  if (breakStart && breakEnd) {
+    breakMinutes = Math.max(0, toMinutes(breakEnd) - toMinutes(breakStart));
+  }
+
+  let realMinutes = Math.max(workMinutes - breakMinutes, 1);
+  let hours = realMinutes / 60;
 
   let hourly = (net / hours).toFixed(2);
 
+  // 💰 логика выплат
   let cashPaid = 0;
-  let cashText = "🏦 Банк";
+  let bankPaid = 0;
 
   if (cash > 60) {
     cashPaid = Math.min(net, cash - 60);
-    cashText = "💵 " + cashPaid + " zl";
+    bankPaid = net - cashPaid;
+  } else {
+    bankPaid = net;
   }
 
   let result =
 `💰 Чистий: ${net} zl
 🚲 Оренда: -30 zl
 ⏱ ${hourly} zl/год
-${cashText}`;
+
+💵 Готівкою: ${cashPaid} zl
+🏦 Банком: ${bankPaid} zl`;
 
   document.getElementById("result").innerText = result;
 
   let copyString =
 `${formatDateLabel(date)}
 ${start}-${end}
+Перерва: ${breakStart || "-"}-${breakEnd || "-"}
 💰 ${net} zl
 ⏱ ${hourly} zl/h
-💵 ${cashPaid} zl`;
+💵 ${cashPaid} zl | 🏦 ${bankPaid} zl`;
 
   document.getElementById("copyText").innerText = copyString;
   document.getElementById("copyBox").style.display = "block";
