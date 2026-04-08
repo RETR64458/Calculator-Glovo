@@ -1,42 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Glovo Calculator</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <title>Rider Glovo Calculator</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #00c853;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #00a844;
+    }
+
+    .result {
+      margin-top: 15px;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    .history {
+      margin-top: 20px;
+      text-align: left;
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial; text-align:center; padding:20px;">
 
-    <h2>💰 Glovo Калькулятор</h2>
+<body>
 
-    <input id="start" placeholder="Початок (10:00)"><br><br>
-    <input id="end" placeholder="Кінець (18:00)"><br><br>
-    <input id="money" placeholder="Заробіток (zl)"><br><br>
+<div class="card">
+  <h2>🚴 Glovo Calculator</h2>
 
-    <button onclick="calc()">Розрахувати</button>
+  <input id="date" placeholder="Дата (08.04.2026)">
+  <input id="start" placeholder="Початок (12:00)">
+  <input id="end" placeholder="Кінець (20:00)">
+  <input id="earn" type="number" placeholder="Заробіток (zl)">
+  <input id="cash" type="number" placeholder="Готівка (zl)">
 
-    <p id="result"></p>
+  <button onclick="calc()">Розрахувати</button>
 
-    <script>
-        function calc() {
-            let start = document.getElementById("start").value;
-            let end = document.getElementById("end").value;
-            let money = parseFloat(document.getElementById("money").value);
+  <div class="result" id="result"></div>
 
-            let s = start.split(":");
-            let e = end.split(":");
+  <h3>📜 Історія</h3>
+  <div class="history" id="history"></div>
+</div>
 
-            let hours = (e[0] - s[0]) + (e[1] - s[1]) / 60;
+<script>
+function calc() {
+  let date = document.getElementById("date").value;
+  let start = document.getElementById("start").value;
+  let end = document.getElementById("end").value;
+  let earn = Number(document.getElementById("earn").value);
+  let cash = Number(document.getElementById("cash").value);
 
-            let hourly = money / hours;
-            let finalMoney = money - 30;
+  let rent = 30;
+  let net = earn - rent;
 
-            document.getElementById("result").innerHTML =
-                "⏱ Години: " + hours.toFixed(2) + "<br>" +
-                "💸 zl/год: " + hourly.toFixed(2) + "<br>" +
-                "🚴 Після оренди: " + finalMoney.toFixed(2);
-        }
-    </script>
+  // години
+  let startH = parseInt(start.split(":")[0]);
+  let endH = parseInt(end.split(":")[0]);
+  let hours = Math.max(endH - startH, 1);
+
+  let hourly = (net / hours).toFixed(2);
+
+  let result = "";
+
+  if (cash > 60) {
+    let payout = Math.min(net, cash - 60);
+    let left = cash - payout;
+
+    result =
+`📅 ${date}
+⏰ ${start} - ${end}
+💰 Чистий: ${net} zl (-30 оренда)
+💵 Готівка: ${left} zl
+⏱ ${hourly} zl/год
+✅ Виплата готівкою`;
+  } else {
+    result =
+`📅 ${date}
+⏰ ${start} - ${end}
+💰 Чистий: ${net} zl (-30 оренда)
+⏱ ${hourly} zl/год
+🏦 Виплата на банк`;
+  }
+
+  document.getElementById("result").innerText = result;
+
+  // історія
+  let history = JSON.parse(localStorage.getItem("glovo_history") || "[]");
+  history.unshift(result);
+  localStorage.setItem("glovo_history", JSON.stringify(history));
+
+  renderHistory();
+}
+
+function renderHistory() {
+  let history = JSON.parse(localStorage.getItem("glovo_history") || "[]");
+  document.getElementById("history").innerText = history.slice(0, 5).join("\n\n");
+}
+
+renderHistory();
+</script>
 
 </body>
 </html>
