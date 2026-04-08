@@ -68,7 +68,6 @@ button {
 .rent {
   color: #f87171;
 }
-
 </style>
 </head>
 
@@ -107,15 +106,15 @@ button {
 
 <script>
 
+// ✅ тільки нормальна дата
 function formatDateLabel(dateStr) {
-  let today = new Date();
   let d = new Date(dateStr);
 
-  let diff = Math.floor((today - d) / (1000*60*60*24));
+  let day = String(d.getDate()).padStart(2, '0');
+  let month = String(d.getMonth() + 1).padStart(2, '0');
+  let year = d.getFullYear();
 
-  if (diff === 0) return "Сьогодні";
-  if (diff === 1) return "Вчора";
-  return dateStr;
+  return `${day}.${month}.${year}`;
 }
 
 function calc() {
@@ -152,7 +151,6 @@ ${cashText}`;
 
   document.getElementById("result").innerText = result;
 
-  // збереження
   let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
 
   history.unshift({
@@ -187,7 +185,7 @@ function renderHistory() {
 <div class="item">
 <b>${formatDateLabel(item.date)}</b><br>
 💰 ${item.net} zl<br>
-<span class="rent">🚲 -30 zl оренда</span><br>
+<span class="rent">🚲 Оренда: -30 zl</span><br>
 ⏱ ${item.hourly} zl/год<br>
 💵 ${item.cashPaid} zl
 </div>`;
