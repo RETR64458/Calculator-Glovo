@@ -3,55 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <title>Rider Glovo Calculator</title>
+
   <style>
     body {
       font-family: Arial;
-      background: #f5f5f5;
-      text-align: center;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      margin: 0;
       padding: 20px;
+      text-align: center;
     }
 
     .card {
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 400px;
+      max-width: 420px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 15px;
     }
 
     input {
-      width: 90%;
+      width: 92%;
       padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
+      margin: 6px 0;
+      border-radius: 10px;
       border: 1px solid #ccc;
+      font-size: 14px;
     }
 
-    button {
-      padding: 10px 15px;
+    .btn {
+      width: 45%;
+      padding: 10px;
+      margin: 10px 5px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .calc {
       background: #00c853;
       color: white;
-      cursor: pointer;
-      margin-top: 10px;
     }
 
-    button:hover {
-      background: #00a844;
+    .clear {
+      background: #e53935;
+      color: white;
     }
 
     .result {
       margin-top: 15px;
-      white-space: pre-line;
       text-align: left;
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 10px;
+      white-space: pre-line;
+    }
+
+    .cash-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: #fff3cd;
+      border-radius: 10px;
+      font-weight: bold;
     }
 
     .history {
       margin-top: 20px;
       text-align: left;
-      font-size: 14px;
+      font-size: 13px;
+      background: #fafafa;
+      padding: 10px;
+      border-radius: 10px;
     }
   </style>
 </head>
@@ -67,15 +94,18 @@
   <input id="earn" type="number" placeholder="Заробіток (zl)">
   <input id="cash" type="number" placeholder="Готівка (zl)">
 
-  <button onclick="calc()">Розрахувати</button>
+  <button class="btn calc" onclick="calc()">Розрахувати</button>
+  <button class="btn clear" onclick="clearAll()">Очистити</button>
 
   <div class="result" id="result"></div>
+  <div class="cash-box" id="cashInfo"></div>
 
   <h3>📜 Історія</h3>
   <div class="history" id="history"></div>
 </div>
 
 <script>
+
 function calc() {
   let date = document.getElementById("date").value;
   let start = document.getElementById("start").value;
@@ -86,7 +116,6 @@ function calc() {
   let rent = 30;
   let net = earn - rent;
 
-  // години
   let startH = parseInt(start.split(":")[0]);
   let endH = parseInt(end.split(":")[0]);
   let hours = Math.max(endH - startH, 1);
@@ -94,43 +123,63 @@ function calc() {
   let hourly = (net / hours).toFixed(2);
 
   let result = "";
+  let cashPaid = 0;
 
   if (cash > 60) {
-    let payout = Math.min(net, cash - 60);
-    let left = cash - payout;
+    cashPaid = Math.min(net, cash - 60);
+    let left = cash - cashPaid;
 
     result =
 `📅 ${date}
 ⏰ ${start} - ${end}
-💰 Чистий: ${net} zl (-30 оренда)
-💵 Готівка: ${left} zl
-⏱ ${hourly} zl/год
-✅ Виплата готівкою`;
+💰 Заробіток: ${net} zl (-30 оренда)
+⏱ Погодинна: ${hourly} zl/год
+💵 Готівка залишок: ${left} zl
+✅ Статус: готівкова виплата`;
+
   } else {
     result =
 `📅 ${date}
 ⏰ ${start} - ${end}
-💰 Чистий: ${net} zl (-30 оренда)
-⏱ ${hourly} zl/год
-🏦 Виплата на банк`;
+💰 Заробіток: ${net} zl (-30 оренда)
+⏱ Погодинна: ${hourly} zl/год
+🏦 Статус: виплата на банк`;
   }
 
   document.getElementById("result").innerText = result;
 
+  document.getElementById("cashInfo").innerText =
+    cashPaid > 0
+      ? "💵 Виплачено готівкою: " + cashPaid + " zl"
+      : "💵 Готівка не виплачувалась";
+
   // історія
   let history = JSON.parse(localStorage.getItem("glovo_history") || "[]");
-  history.unshift(result);
+  history.unshift(result + "\n💵 виплачено: " + cashPaid + " zl");
+
   localStorage.setItem("glovo_history", JSON.stringify(history));
 
   renderHistory();
 }
 
+function clearAll() {
+  document.getElementById("date").value = "";
+  document.getElementById("start").value = "";
+  document.getElementById("end").value = "";
+  document.getElementById("earn").value = "";
+  document.getElementById("cash").value = "";
+  document.getElementById("result").innerText = "";
+  document.getElementById("cashInfo").innerText = "";
+}
+
 function renderHistory() {
   let history = JSON.parse(localStorage.getItem("glovo_history") || "[]");
-  document.getElementById("history").innerText = history.slice(0, 5).join("\n\n");
+  document.getElementById("history").innerText =
+    history.slice(0, 5).join("\n\n");
 }
 
 renderHistory();
+
 </script>
 
 </body>
