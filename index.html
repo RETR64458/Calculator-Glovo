@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glovo Rider</title>
+<title>Glovo Rider Mini</title>
 
 <style>
 body {
   margin: 0;
-  font-family: -apple-system, sans-serif;
-  background: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg, #0f172a, #020617);
   color: white;
 }
 
@@ -24,6 +24,11 @@ body {
   padding: 20px;
   border-radius: 20px;
   margin-bottom: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h3 {
+  margin-top: 0;
 }
 
 input {
@@ -34,6 +39,7 @@ input {
   border: none;
   background: #334155;
   color: white;
+  font-size: 16px;
 }
 
 button {
@@ -43,31 +49,41 @@ button {
   border: none;
   margin-top: 10px;
   font-weight: bold;
+  font-size: 16px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
 }
-
-.calc { background: #22c55e; }
-.total { background: #3b82f6; }
 
 .result {
-  margin-top: 10px;
+  margin-top: 15px;
   background: #020617;
+  padding: 14px;
+  border-radius: 14px;
+  white-space: pre-line;
+  font-size: 15px;
+}
+
+.copyBox {
+  margin-top: 10px;
+  background: #111827;
   padding: 12px;
   border-radius: 12px;
-  white-space: pre-line;
-}
-
-.history {
   font-size: 14px;
+  position: relative;
 }
 
-.item {
-  padding: 10px;
-  border-bottom: 1px solid #334155;
+.copyBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #3b82f6;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: white;
 }
 
-.rent {
-  color: #f87171;
-}
 </style>
 </head>
 
@@ -75,7 +91,6 @@ button {
 
 <div class="container">
 
-  <!-- КАЛЬКУЛЯТОР -->
   <div class="card">
     <h3>🚴 Новий день</h3>
 
@@ -85,35 +100,26 @@ button {
     <input type="number" id="earn" placeholder="Заробіток (zl)">
     <input type="number" id="cash" placeholder="Готівка (zl)">
 
-    <button class="calc" onclick="calc()">Розрахувати</button>
+    <button onclick="calc()">Розрахувати</button>
 
     <div class="result" id="result"></div>
-  </div>
 
-  <!-- ПОВНИЙ ЗАРОБІТОК -->
-  <div class="card">
-    <button class="total" onclick="total()">💰 Повний заробіток</button>
-    <div class="result" id="totalResult"></div>
-  </div>
+    <div class="copyBox" id="copyBox" style="display:none;">
+      <button class="copyBtn" onclick="copyText()">Копіювати</button>
+      <div id="copyText"></div>
+    </div>
 
-  <!-- ІСТОРІЯ -->
-  <div class="card">
-    <h3>📅 Історія</h3>
-    <div class="history" id="history"></div>
   </div>
 
 </div>
 
 <script>
 
-// ✅ тільки нормальна дата
 function formatDateLabel(dateStr) {
   let d = new Date(dateStr);
-
   let day = String(d.getDate()).padStart(2, '0');
   let month = String(d.getMonth() + 1).padStart(2, '0');
   let year = d.getFullYear();
-
   return `${day}.${month}.${year}`;
 }
 
@@ -134,67 +140,36 @@ function calc() {
   let hourly = (net / hours).toFixed(2);
 
   let cashPaid = 0;
-  let cashText = "";
+  let cashText = "🏦 Банк";
 
   if (cash > 60) {
     cashPaid = Math.min(net, cash - 60);
-    cashText = "💵 Виплачено: " + cashPaid + " zl";
-  } else {
-    cashText = "🏦 Банк";
+    cashText = "💵 " + cashPaid + " zl";
   }
 
   let result =
 `💰 Чистий: ${net} zl
-🚲 Оренда велосипеда: -30 zl
+🚲 Оренда: -30 zl
 ⏱ ${hourly} zl/год
 ${cashText}`;
 
   document.getElementById("result").innerText = result;
 
-  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
+  let copyString =
+`${formatDateLabel(date)}
+${start}-${end}
+💰 ${net} zl
+⏱ ${hourly} zl/h
+💵 ${cashPaid} zl`;
 
-  history.unshift({
-    date,
-    net,
-    rent,
-    hourly,
-    cashPaid
-  });
-
-  localStorage.setItem("glovo_data", JSON.stringify(history));
-
-  renderHistory();
+  document.getElementById("copyText").innerText = copyString;
+  document.getElementById("copyBox").style.display = "block";
 }
 
-function total() {
-  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
-
-  let sum = history.reduce((acc, item) => acc + item.net, 0);
-
-  document.getElementById("totalResult").innerText =
-    "💰 Загальний заробіток: " + sum + " zl";
+function copyText() {
+  let text = document.getElementById("copyText").innerText;
+  navigator.clipboard.writeText(text);
 }
-
-function renderHistory() {
-  let history = JSON.parse(localStorage.getItem("glovo_data") || "[]");
-
-  let html = "";
-
-  history.slice(0, 10).forEach(item => {
-    html += `
-<div class="item">
-<b>${formatDateLabel(item.date)}</b><br>
-💰 ${item.net} zl<br>
-<span class="rent">🚲 Оренда: -30 zl</span><br>
-⏱ ${item.hourly} zl/год<br>
-💵 ${item.cashPaid} zl
-</div>`;
-  });
-
-  document.getElementById("history").innerHTML = html;
-}
-
-renderHistory();
 
 </script>
 
