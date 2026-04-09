@@ -6,22 +6,24 @@ const DAILY_COST = 30;
 
 export default function BikeCalendarApp() {
   const [balance, setBalance] = useState(0);
-  const [savedBalance, setSavedBalance] = useState(0);
+  const [inputAmount, setInputAmount] = useState(0);
 
   useEffect(() => {
     const stored = localStorage.getItem("balance");
-    if (stored) {
-      setBalance(Number(stored));
-      setSavedBalance(Number(stored));
-    }
+    if (stored) setBalance(Number(stored));
   }, []);
 
-  const saveBalance = () => {
+  useEffect(() => {
     localStorage.setItem("balance", balance);
-    setSavedBalance(balance);
+  }, [balance]);
+
+  const addBalance = () => {
+    if (!inputAmount) return;
+    setBalance(balance + inputAmount);
+    setInputAmount(0);
   };
 
-  const daysCovered = Math.floor(savedBalance / DAILY_COST);
+  const daysCovered = Math.floor(balance / DAILY_COST);
 
   const generateDays = () => {
     const days = [];
@@ -31,9 +33,9 @@ export default function BikeCalendarApp() {
       const date = new Date();
       date.setDate(today.getDate() + i);
 
-      let status = "future";
-      if (i < daysCovered) status = "paid";
-      else if (i === daysCovered) status = "payday";
+      let status = "red";
+      if (i < daysCovered) status = "green";
+      else if (i === daysCovered) status = "blue";
 
       days.push({
         day: date.getDate(),
@@ -47,37 +49,44 @@ export default function BikeCalendarApp() {
   const days = generateDays();
 
   return (
-    <div className="p-4 max-w-md mx-auto">
+    <div className="p-4 max-w-md mx-auto space-y-4">
       <Card className="rounded-2xl shadow-lg">
         <CardContent className="p-4 space-y-4">
           <h1 className="text-xl font-bold">🚲 Bike Rental</h1>
 
-          <div className="space-y-2">
+          {/* Balance display */}
+          <div className="flex justify-between items-center bg-gray-100 p-3 rounded-xl">
+            <span className="text-gray-600">Баланс:</span>
+            <span className="text-lg font-bold">{balance} zł</span>
+          </div>
+
+          {/* Add money */}
+          <div className="flex gap-2">
             <input
               type="number"
-              value={balance}
-              onChange={(e) => setBalance(Number(e.target.value))}
-              placeholder="Баланс (PLN)"
-              className="w-full p-2 border rounded-xl"
+              value={inputAmount}
+              onChange={(e) => setInputAmount(Number(e.target.value))}
+              placeholder="+ Сума"
+              className="flex-1 p-2 border rounded-xl"
             />
-
-            <Button onClick={saveBalance} className="w-full rounded-xl">
-              Зберегти
+            <Button onClick={addBalance} className="rounded-xl">
+              Додати
             </Button>
           </div>
 
           <div className="text-sm text-gray-500">
-            Покрито днів: {daysCovered}
+            Днів покрито: {daysCovered}
           </div>
 
+          {/* Calendar */}
           <div className="grid grid-cols-7 gap-2">
             {days.map((d, i) => (
               <div
                 key={i}
-                className={`p-2 text-center rounded-xl text-sm
-                  ${d.status === "paid" ? "bg-green-500 text-white" : ""}
-                  ${d.status === "payday" ? "bg-blue-500 text-white" : ""}
-                  ${d.status === "future" ? "bg-gray-200" : ""}
+                className={`p-2 text-center rounded-xl text-sm font-medium
+                  ${d.status === "green" ? "bg-green-500 text-white" : ""}
+                  ${d.status === "blue" ? "bg-blue-500 text-white" : ""}
+                  ${d.status === "red" ? "bg-red-400 text-white" : ""}
                 `}
               >
                 {d.day}
@@ -86,7 +95,7 @@ export default function BikeCalendarApp() {
           </div>
 
           <div className="text-xs text-gray-400">
-            🟢 оплачені | 🔵 день оплати
+            🟢 є гроші | 🔵 день оплати | 🔴 гроші закінчились
           </div>
         </CardContent>
       </Card>
