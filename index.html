@@ -1,244 +1,85 @@
+// Simple Telegram Mini App (HTML + JS) for bike rental payment calendar
+// Daily cost: 30 PLN
+
+// === index.html ===
+
 <!DOCTYPE html>
-<html lang="uk">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Glovo Rider Red</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #1a0000, #0a0000);
-  color: white;
-}
-
-.container {
-  max-width: 420px;
-  margin: auto;
-  padding: 18px;
-}
-
-.card {
-  background: rgba(40,0,0,0.7);
-  backdrop-filter: blur(18px);
-  padding: 20px;
-  border-radius: 26px;
-  box-shadow: 0 25px 60px rgba(255,0,0,0.25);
-}
-
-h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  margin: 6px 0 10px;
-  border-radius: 16px;
-  border: none;
-  background: #2a0a0a;
-  color: white;
-  font-size: 15px;
-}
-
-.row {
-  display: flex;
-  gap: 8px;
-}
-
-button {
-  width: 100%;
-  padding: 15px;
-  border-radius: 18px;
-  border: none;
-  margin-top: 12px;
-  font-weight: bold;
-  font-size: 16px;
-  background: linear-gradient(135deg, #ef4444, #f87171);
-  color: white;
-}
-
-.result {
-  margin-top: 16px;
-  background: #0a0000;
-  padding: 16px;
-  border-radius: 18px;
-  font-size: 15px;
-}
-
-.resultLine {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid #3f1d1d;
-}
-
-.resultLine:last-child { border-bottom: none; }
-
-.green { color: #4ade80; }
-.blue { color: #60a5fa; }
-.red { color: #f87171; }
-
-.copyBox {
-  margin-top: 14px;
-  background: #0a0000;
-  padding: 14px;
-  border-radius: 18px;
-  font-size: 14px;
-  border: 1px solid #3f1d1d;
-}
-
-.copyBtn {
-  margin-top: 10px;
-  width: 100%;
-  background: linear-gradient(135deg, #dc2626, #ef4444);
-  border: none;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 14px;
-  color: white;
-}
-
-.success {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #4ade80;
-  display: none;
-}
-
-.label {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 8px;
-}
-
-</style>
+  <meta charset="UTF-8" />
+  <title>Bike Rental Calendar</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .day {
+      padding: 10px;
+      text-align: center;
+      border-radius: 6px;
+    }
+    .green { background: #4CAF50; color: white; }
+    .blue { background: #2196F3; color: white; }
+    .gray { background: #eee; }
+  </style>
 </head>
-
 <body>
+  <h2>Bike Rental Tracker</h2>
 
-<div class="container">
+  <label>Enter Balance (PLN):</label>
+  <input type="number" id="balance" />
+  <button onclick="generateCalendar()">Generate</button>
 
-  <div class="card">
-    <h3>🔥 Робочий день</h3>
+  <div id="calendar" class="calendar"></div>
 
-    <input type="date" id="date">
+  <script>
+    const DAILY_COST = 30;
 
-    <div class="label">Робочий час</div>
-    <div class="row">
-      <input type="time" id="start">
-      <input type="time" id="end">
-    </div>
+    function generateCalendar() {
+      const balance = parseInt(document.getElementById('balance').value);
+      const calendar = document.getElementById('calendar');
+      calendar.innerHTML = '';
 
-    <div class="label">Перерва</div>
-    <div class="row">
-      <input type="time" id="breakStart">
-      <input type="time" id="breakEnd">
-    </div>
+      if (!balance || balance <= 0) return;
 
-    <input type="number" id="earn" placeholder="Заробіток (zl)">
-    <input type="number" id="cash" placeholder="Готівка (zl)">
+      const daysCovered = Math.floor(balance / DAILY_COST);
 
-    <button onclick="calc()">Розрахувати</button>
+      const today = new Date();
+      let currentDate = new Date(today);
 
-    <div class="result" id="result"></div>
+      for (let i = 0; i < 30; i++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day');
 
-    <div class="copyBox" id="copyBox" style="display:none;">
-      <div id="copyText"></div>
-      <button class="copyBtn" onclick="copyText()">Скопіювати</button>
-      <div class="success" id="copySuccess">✔ Скопійовано</div>
-    </div>
+        const dayNumber = currentDate.getDate();
+        dayDiv.innerText = dayNumber;
 
-  </div>
+        if (i < daysCovered) {
+          dayDiv.classList.add('green'); // already covered
+        } else if (i === daysCovered) {
+          dayDiv.classList.add('blue'); // payment day
+        } else {
+          dayDiv.classList.add('gray');
+        }
 
-</div>
-
-<script>
-
-function formatDateLabel(dateStr) {
-  let d = new Date(dateStr);
-  let day = String(d.getDate()).padStart(2, '0');
-  let month = String(d.getMonth() + 1).padStart(2, '0');
-  let year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-function toMinutes(t) {
-  if (!t) return 0;
-  let [h,m] = t.split(":").map(Number);
-  return h*60 + m;
-}
-
-function calc() {
-  let date = document.getElementById("date").value;
-  let start = document.getElementById("start").value;
-  let end = document.getElementById("end").value;
-  let breakStart = document.getElementById("breakStart").value;
-  let breakEnd = document.getElementById("breakEnd").value;
-
-  let earn = Number(document.getElementById("earn").value);
-  let cash = Number(document.getElementById("cash").value);
-
-  let rent = 30;
-  let net = earn - rent;
-
-  let workMinutes = toMinutes(end) - toMinutes(start);
-  let breakMinutes = (breakStart && breakEnd)
-    ? Math.max(0, toMinutes(breakEnd) - toMinutes(breakStart))
-    : 0;
-
-  let realMinutes = Math.max(workMinutes - breakMinutes, 1);
-  let hours = realMinutes / 60;
-
-  let hourly = (net / hours).toFixed(2);
-
-  let cashPaid = 0;
-  let bankPaid = 0;
-
-  if (cash > 60) {
-    cashPaid = Math.min(net, cash - 60);
-    bankPaid = net - cashPaid;
-  } else {
-    bankPaid = net;
-  }
-
-  let breakText = (breakStart && breakEnd)
-    ? `${breakStart}-${breakEnd}`
-    : "Без перерви";
-
-  document.getElementById("result").innerHTML = `
-    <div class="resultLine"><span>💰 Чистий</span><span class="green">${net} zl</span></div>
-    <div class="resultLine"><span>🚲 Оренда</span><span class="red">-30 zl</span></div>
-    <div class="resultLine"><span>⏱ За годину</span><span>${hourly} zl</span></div>
-    <div class="resultLine"><span>💵 Готівка</span><span class="green">${cashPaid} zl</span></div>
-    <div class="resultLine"><span>🏦 Банк</span><span class="blue">${bankPaid} zl</span></div>
-  `;
-
-  let copyString = `📅 ${formatDateLabel(date)}\n` +
-`⏰ ${start} - ${end}\n` +
-`☕ ${breakText}\n\n` +
-`💰 Чистий\n${net} zl\n` +
-`🚲 Оренда\n-30 zl\n` +
-`⏱ За годину\n${hourly} zl\n` +
-`💵 Готівка\n${cashPaid} zl\n` +
-`🏦 Банк\n${bankPaid} zl`;
-
-  document.getElementById("copyText").innerText = copyString;
-  document.getElementById("copyBox").style.display = "block";
-}
-
-function copyText() {
-  let text = document.getElementById("copyText").innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    let el = document.getElementById("copySuccess");
-    el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 1500);
-  });
-}
-
-</script>
-
+        calendar.appendChild(dayDiv);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    }
+  </script>
 </body>
 </html>
+
+// === How it works ===
+// 1. User enters balance
+// 2. Script calculates how many days are covered (balance / 30)
+// 3. Generates 30-day calendar
+// 4. Colors:
+//    Green = paid days
+//    Blue = next payment day
+//    Gray = unpaid future
+
+// === To use in Telegram ===
+// 1. Host this file (e.g. on Vercel / Netlify)
+// 2. Create bot via @BotFather
+// 3. Enable Web App
+// 4. Open via Telegram button
