@@ -1,111 +1,114 @@
-import React, { useMemo, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gogobike - Аренда велосипедов</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        header {
+            background: #222;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        nav {
+            background: #333;
+            display: flex;
+            justify-content: center;
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background: #555;
+        }
+        .container {
+            padding: 20px;
+        }
+        .bike {
+            background: white;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .bike img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .hidden {
+            display: none;
+            margin-top: 15px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
 
-const DAILY_COST = 30;
-const START_DATE = new Date("2026-04-09");
+<header>
+    <h1>Gogobike</h1>
+    <p>Аренда электровелосипедов в Лодзи</p>
+</header>
 
-function addDays(date, days) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
+<nav>
+    <a href="#about">О нас</a>
+    <a href="#rent">Аренда</a>
+</nav>
 
-function formatDate(date) {
-  return date.toISOString().split("T")[0];
-}
+<div class="container" id="about">
+    <h2>О компании</h2>
+    <p>Gogobike — сервис аренды электровелосипедов в Польше, город Лодзь. Мы предлагаем удобные и современные велосипеды для прогулок и поездок по городу.</p>
+</div>
 
-export default function BikeMiniApp() {
-  const [balance, setBalance] = useState(210);
-  const [topUp, setTopUp] = useState(0);
+<div class="container" id="rent">
+    <h2>Аренда</h2>
 
-  const days = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < 60; i++) {
-      const date = addDays(START_DATE, i);
-      arr.push(date);
-    }
-    return arr;
-  }, []);
+    <div class="bike">
+        <img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6" alt="Электровелосипед">
+        <h3>Электровелосипед</h3>
+        <p>Цена:</p>
+        <p>30 zł / день</p>
+        <p>210 zł / неделя</p>
+        <button onclick="showInfo()">Арендовать</button>
 
-  const statusMap = useMemo(() => {
-    const map = new Map();
-    let tempBalance = balance;
-
-    days.forEach((day, i) => {
-      const key = formatDate(day);
-
-      if (tempBalance >= DAILY_COST) {
-        map.set(key, "green");
-        tempBalance -= DAILY_COST;
-      } else if (tempBalance > 0) {
-        map.set(key, "blue");
-      } else {
-        map.set(key, "red");
-      }
-    });
-
-    return map;
-  }, [balance, days]);
-
-  const handleTopUp = () => {
-    if (!topUp) return;
-    setBalance((prev) => prev + Number(topUp));
-    setTopUp(0);
-  };
-
-  return (
-    <div className="min-h-screen bg-neutral-950 text-white p-4 flex flex-col items-center">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
-      >
-        <Card className="bg-neutral-900 border-neutral-800 rounded-2xl shadow-xl">
-          <CardContent className="p-5 space-y-4">
-            <div className="text-xl font-semibold">
-              💰 Баланс: {balance} zł
-            </div>
-
-            <div className="flex gap-2">
-              <input
-                type="number"
-                value={topUp}
-                onChange={(e) => setTopUp(e.target.value)}
-                placeholder="Поповнити"
-                className="w-full p-2 rounded-xl bg-neutral-800 text-white outline-none"
-              />
-              <Button onClick={handleTopUp} className="rounded-xl">
-                Поповнити
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-7 gap-2 mt-5">
-          {days.map((day) => {
-            const key = formatDate(day);
-            const status = statusMap.get(key);
-
-            const color =
-              status === "green"
-                ? "bg-green-500"
-                : status === "blue"
-                ? "bg-blue-500"
-                : "bg-red-500";
-
-            return (
-              <div
-                key={key}
-                className={`h-10 w-10 rounded-xl ${color} flex items-center justify-center text-[10px] text-white`}
-              >
-                {day.getDate()}
-              </div>
-            );
-          })}
+        <div id="rentInfo" class="hidden">
+            <p>Как арендовать:</p>
+            <p>Позвоните по номеру: <strong>+48 880 647 127</strong></p>
+            <p>Адрес: Radwanska 56, Łódź</p>
         </div>
-      </motion.div>
     </div>
-  );
-}
+
+</div>
+
+<script>
+    function showInfo() {
+        var info = document.getElementById('rentInfo');
+        info.classList.toggle('hidden');
+    }
+</script>
+
+</body>
+</html>
