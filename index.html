@@ -24,12 +24,6 @@ header {
 
 header h1 {
     font-size: 48px;
-    letter-spacing: 2px;
-}
-
-header p {
-    opacity: 0.8;
-    margin-top: 10px;
 }
 
 nav {
@@ -45,7 +39,6 @@ nav a {
     text-decoration: none;
     padding: 10px 18px;
     border-radius: 8px;
-    transition: 0.3s;
 }
 
 nav a:hover {
@@ -75,6 +68,8 @@ nav a:hover {
 .bike img {
     width: 100%;
     border-radius: 15px;
+    background: transparent;
+    mix-blend-mode: lighten;
 }
 
 .price {
@@ -92,12 +87,10 @@ nav a:hover {
     font-size: 16px;
     cursor: pointer;
     margin-top: 15px;
-    transition: 0.3s;
 }
 
-.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(255,0,0,0.4);
+.pay {
+    background: linear-gradient(90deg, #00c853, #00e676);
 }
 
 .hidden {
@@ -109,26 +102,15 @@ nav a:hover {
     border: 1px solid #7a0000;
 }
 
-.steps p {
-    margin: 8px 0;
-}
-
-.pay {
-    background: linear-gradient(90deg, #00c853, #00e676);
-}
-
 footer {
     text-align: center;
     padding: 30px;
     background: #111;
     margin-top: 40px;
-    opacity: 0.7;
 }
 
 @media(max-width: 768px) {
-    .bike {
-        grid-template-columns: 1fr;
-    }
+    .bike {grid-template-columns: 1fr;}
 }
 </style>
 </head>
@@ -149,35 +131,26 @@ footer {
     <div class="card">
         <h2>О компании</h2>
         <p>Gogobike — сервис аренды электровелосипедов, открытый в 2023 году в городе Лодзь.</p>
-        <p>Мы создали удобный и современный способ передвижения по городу — без пробок, без лишних затрат и с максимальным комфортом.</p>
-        <p>Наши велосипеды подходят как для повседневных поездок, так и для прогулок. Просто арендуй и поезжай.</p>
+        <p>Мы предлагаем удобный, быстрый и современный способ передвижения по городу.</p>
     </div>
 </section>
 
 <section class="section" id="rent">
     <div class="card bike">
 
-        <img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6" alt="bike">
+        <img src="/mnt/data/500px_Ghost-Riot-E-Riot-CF-Advanced-Rower-elektryczny-full-carbon-0002.png" alt="bike">
 
         <div>
             <h2>Электровелосипед</h2>
             <div class="price">30 zł / день</div>
             <div class="price">210 zł / неделя</div>
 
-            <button class="btn" onclick="showInfo()">Арендовать</button>
+            <button class="btn pay" onclick="pay()">Оплатить 210 zł</button>
 
             <div id="rentInfo" class="hidden">
-                <div class="steps">
-                    <p><b>Как арендовать:</b></p>
-                    <p>1. Нажмите оплатить</p>
-                    <p>2. Оплатите через BLIK</p>
-                    <p>3. Свяжитесь с нами</p>
-                </div>
-
-                <p><b>Телефон:</b> 880647127</p>
-                <p><b>Адрес:</b> Radwanska 56, Łódź</p>
-
-                <button class="btn pay" onclick="pay()">Оплатить 220 zł</button>
+                <p>Вы оплачиваете 210 злотых за аренду велосипеда на неделю.</p>
+                <p>После оплаты прошу связаться по номеру: 880647127</p>
+                <p>Адрес: Radwanska 56, Łódź</p>
             </div>
         </div>
 
@@ -189,12 +162,9 @@ footer {
 </footer>
 
 <script>
-function showInfo() {
-    document.getElementById('rentInfo').classList.toggle('hidden');
-}
-
 function pay() {
-    alert('Оплата через BLIK: отправьте 220 zł на номер 880647127');
+    document.getElementById('rentInfo').classList.remove('hidden');
+    alert('Оплата через BLIK: отправьте 210 zł на номер 880647127');
 }
 </script>
 
