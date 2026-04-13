@@ -4,167 +4,117 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gogobike</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-* {margin:0; padding:0; box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Poppins;background:#0b0b0b;color:white}
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: #0b0b0b;
-    color: white;
-}
+header{padding:80px 20px;text-align:center;background:radial-gradient(circle,#7a0000,#000)}
+header h1{font-size:50px}
 
-header {
-    padding: 60px 20px;
-    text-align: center;
-    background: radial-gradient(circle at top, #7a0000, #000);
-}
+nav{display:flex;justify-content:center;gap:20px;background:#111;padding:15px}
+nav a{color:white;text-decoration:none;padding:10px 18px;border-radius:8px}
+nav a:hover{background:#c40000}
 
-header h1 {
-    font-size: 48px;
-}
+.section{padding:60px 20px;max-width:1200px;margin:auto}
 
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background: #111;
-    padding: 15px;
-}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px}
 
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-}
+.card{background:#111;border-radius:20px;padding:15px;box-shadow:0 0 20px rgba(255,0,0,0.2);text-align:center}
 
-nav a:hover {
-    background: #c40000;
-}
+.card img{width:100%;border-radius:15px}
 
-.section {
-    padding: 60px 20px;
-    max-width: 1100px;
-    margin: auto;
-}
+.bike{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
 
-.card {
-    background: linear-gradient(145deg, #111, #1c1c1c);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 0 30px rgba(255,0,0,0.15);
-}
+.price{margin:10px 0}
 
-.bike {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    align-items: center;
-}
+.btn{background:linear-gradient(90deg,#c40000,#ff1a1a);padding:12px 25px;border:none;border-radius:10px;color:white;cursor:pointer;margin-top:10px}
 
-.bike img {
-    width: 100%;
-    border-radius: 15px;
-    background: transparent;
-    mix-blend-mode: lighten;
-}
+.pay{background:linear-gradient(90deg,#00c853,#00e676)}
 
-.price {
-    font-size: 20px;
-    margin: 10px 0;
-}
+.hidden{display:none;margin-top:20px;padding:15px;background:#0f0f0f;border-radius:10px;border:1px solid #7a0000}
 
-.btn {
-    display: inline-block;
-    background: linear-gradient(90deg, #c40000, #ff1a1a);
-    padding: 12px 25px;
-    border-radius: 10px;
-    border: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 15px;
-}
+footer{text-align:center;padding:30px;background:#111;margin-top:40px}
 
-.pay {
-    background: linear-gradient(90deg, #00c853, #00e676);
-}
-
-.hidden {
-    display: none;
-    margin-top: 20px;
-    padding: 20px;
-    background: #0f0f0f;
-    border-radius: 15px;
-    border: 1px solid #7a0000;
-}
-
-footer {
-    text-align: center;
-    padding: 30px;
-    background: #111;
-    margin-top: 40px;
-}
-
-@media(max-width: 768px) {
-    .bike {grid-template-columns: 1fr;}
-}
+@media(max-width:768px){.bike{grid-template-columns:1fr}}
 </style>
 </head>
 
 <body>
 
 <header>
-    <h1>Gogobike</h1>
-    <p>Электровелосипеды в Лодзи</p>
+<h1>Gogobike</h1>
+<p>Аренда электровелосипедов в Лодзи</p>
 </header>
 
 <nav>
-    <a href="#about">О нас</a>
-    <a href="#rent">Аренда</a>
+<a href="#home">Главная</a>
+<a href="#rent">Аренда</a>
+<a href="#about">О нас</a>
 </nav>
 
-<section class="section" id="about">
-    <div class="card">
-        <h2>О компании</h2>
-        <p>Gogobike — сервис аренды электровелосипедов, открытый в 2023 году в городе Лодзь.</p>
-        <p>Мы предлагаем удобный, быстрый и современный способ передвижения по городу.</p>
-    </div>
+<!-- ГЛАВНАЯ -->
+<section class="section" id="home">
+<h2>Наши велосипеды</h2>
+<div class="grid">
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890">
+<h3>Городской электровелосипед</h3>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1593764592116-bfb2a97c642a">
+<h3>Горный электровелосипед</h3>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8">
+<h3>Премиум модель</h3>
+</div>
+
+</div>
 </section>
 
+<!-- АРЕНДА -->
 <section class="section" id="rent">
-    <div class="card bike">
+<div class="card bike">
 
-        <img src="/mnt/data/500px_Ghost-Riot-E-Riot-CF-Advanced-Rower-elektryczny-full-carbon-0002.png" alt="bike">
+<img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6">
 
-        <div>
-            <h2>Электровелосипед</h2>
-            <div class="price">30 zł / день</div>
-            <div class="price">210 zł / неделя</div>
+<div>
+<h2>Электровелосипед</h2>
+<div class="price">30 zł / день</div>
+<div class="price">210 zł / неделя</div>
 
-            <button class="btn pay" onclick="pay()">Оплатить 210 zł</button>
+<button class="btn pay" onclick="pay()">Оплатить 210 zł</button>
 
-            <div id="rentInfo" class="hidden">
-                <p>Вы оплачиваете 210 злотых за аренду велосипеда на неделю.</p>
-                <p>После оплаты прошу связаться по номеру: 880647127</p>
-                <p>Адрес: Radwanska 56, Łódź</p>
-            </div>
-        </div>
+<div id="rentInfo" class="hidden">
+<p>Вы оплачиваете 210 злотых за аренду велосипеда на неделю.</p>
+<p>После оплаты свяжитесь по номеру: 880647127</p>
+<p>Адрес: Radwanska 56, Łódź</p>
+</div>
 
-    </div>
+</div>
+</div>
 </section>
 
-<footer>
-    © 2026 Gogobike
-</footer>
+<!-- О НАС -->
+<section class="section" id="about">
+<div class="card">
+<h2>О компании</h2>
+<p>Gogobike — сервис аренды электровелосипедов, открытый в 2023 году в городе Лодзь.</p>
+<p>Простой и удобный способ передвижения по городу без пробок.</p>
+</div>
+</section>
+
+<footer>© Gogobike</footer>
 
 <script>
-function pay() {
-    document.getElementById('rentInfo').classList.remove('hidden');
-    alert('Оплата через BLIK: отправьте 210 zł на номер 880647127');
+function pay(){
+document.getElementById('rentInfo').classList.remove('hidden');
+alert('Оплата через BLIK: отправьте 210 zł на номер 880647127');
 }
 </script>
 
