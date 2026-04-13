@@ -8,16 +8,17 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            background: #0f0f0f;
+            color: #eee;
         }
         header {
-            background: #222;
+            background: linear-gradient(90deg, #000, #7a0000);
             color: white;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
         }
         nav {
-            background: #333;
+            background: #1a1a1a;
             display: flex;
             justify-content: center;
         }
@@ -25,44 +26,56 @@
             color: white;
             padding: 14px 20px;
             text-decoration: none;
+            transition: 0.3s;
         }
         nav a:hover {
-            background: #555;
+            background: #7a0000;
         }
         .container {
             padding: 20px;
         }
         .bike {
-            background: white;
-            padding: 15px;
+            background: #1a1a1a;
+            padding: 20px;
             margin: 20px auto;
-            max-width: 400px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 420px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
             text-align: center;
         }
         .bike img {
             width: 100%;
             border-radius: 10px;
         }
-        button {
-            background: #28a745;
+        .btn {
+            background: #c40000;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-top: 10px;
+            font-size: 16px;
+            transition: 0.3s;
         }
-        button:hover {
-            background: #218838;
+        .btn:hover {
+            background: #ff1a1a;
+            transform: scale(1.05);
         }
         .hidden {
             display: none;
             margin-top: 15px;
-            background: #eee;
-            padding: 10px;
-            border-radius: 5px;
+            background: #111;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #7a0000;
+        }
+        .pay {
+            margin-top: 10px;
+            background: #28a745;
+        }
+        .pay:hover {
+            background: #34d058;
         }
     </style>
 </head>
@@ -80,7 +93,9 @@
 
 <div class="container" id="about">
     <h2>О компании</h2>
-    <p>Gogobike — сервис аренды электровелосипедов в Польше, город Лодзь. Мы предлагаем удобные и современные велосипеды для прогулок и поездок по городу.</p>
+    <p>Gogobike — современный сервис аренды электровелосипедов, основанный в 2023 году в городе Лодзь. Мы создали удобный способ передвижения по городу для жителей и туристов.</p>
+    <p>Наша цель — сделать аренду максимально простой, быстрой и доступной. Мы предлагаем надежные электровелосипеды, которые идеально подходят как для прогулок, так и для повседневных поездок.</p>
+    <p>С Gogobike вы получаете свободу передвижения, комфорт и удовольствие от каждой поездки.</p>
 </div>
 
 <div class="container" id="rent">
@@ -89,15 +104,20 @@
     <div class="bike">
         <img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6" alt="Электровелосипед">
         <h3>Электровелосипед</h3>
-        <p>Цена:</p>
         <p>30 zł / день</p>
         <p>210 zł / неделя</p>
-        <button onclick="showInfo()">Арендовать</button>
+        <button class="btn" onclick="showInfo()">Арендовать</button>
 
         <div id="rentInfo" class="hidden">
-            <p>Как арендовать:</p>
-            <p>Позвоните по номеру: <strong>+48 880 647 127</strong></p>
-            <p>Адрес: Radwanska 56, Łódź</p>
+            <p><strong>Как арендовать:</strong></p>
+            <p>1. Нажмите кнопку оплаты ниже</p>
+            <p>2. Оплатите аренду через BLIK</p>
+            <p>3. Свяжитесь с нами для получения велосипеда</p>
+
+            <p><strong>Телефон:</strong> +48 880 647 127</p>
+            <p><strong>Адрес:</strong> Radwanska 56, Łódź</p>
+
+            <button class="btn pay" onclick="pay()">Оплатить 220 zł (BLIK)</button>
         </div>
     </div>
 
@@ -107,6 +127,10 @@
     function showInfo() {
         var info = document.getElementById('rentInfo');
         info.classList.toggle('hidden');
+    }
+
+    function pay() {
+        alert('Переведите 220 zł через BLIK на номер: 880647127');
     }
 </script>
 
