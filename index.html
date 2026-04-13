@@ -1,89 +1,143 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gogobike - Аренда велосипедов</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f0f0f;
-            color: #eee;
-        }
-        header {
-            background: linear-gradient(90deg, #000, #7a0000);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        nav {
-            background: #1a1a1a;
-            display: flex;
-            justify-content: center;
-        }
-        nav a {
-            color: white;
-            padding: 14px 20px;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        nav a:hover {
-            background: #7a0000;
-        }
-        .container {
-            padding: 20px;
-        }
-        .bike {
-            background: #1a1a1a;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 420px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255,0,0,0.3);
-            text-align: center;
-        }
-        .bike img {
-            width: 100%;
-            border-radius: 10px;
-        }
-        .btn {
-            background: #c40000;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-        .btn:hover {
-            background: #ff1a1a;
-            transform: scale(1.05);
-        }
-        .hidden {
-            display: none;
-            margin-top: 15px;
-            background: #111;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #7a0000;
-        }
-        .pay {
-            margin-top: 10px;
-            background: #28a745;
-        }
-        .pay:hover {
-            background: #34d058;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gogobike</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {margin:0; padding:0; box-sizing:border-box;}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #0b0b0b;
+    color: white;
+}
+
+header {
+    padding: 60px 20px;
+    text-align: center;
+    background: radial-gradient(circle at top, #7a0000, #000);
+}
+
+header h1 {
+    font-size: 48px;
+    letter-spacing: 2px;
+}
+
+header p {
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background: #111;
+    padding: 15px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    background: #c40000;
+}
+
+.section {
+    padding: 60px 20px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.card {
+    background: linear-gradient(145deg, #111, #1c1c1c);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 0 30px rgba(255,0,0,0.15);
+}
+
+.bike {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: center;
+}
+
+.bike img {
+    width: 100%;
+    border-radius: 15px;
+}
+
+.price {
+    font-size: 20px;
+    margin: 10px 0;
+}
+
+.btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #c40000, #ff1a1a);
+    padding: 12px 25px;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255,0,0,0.4);
+}
+
+.hidden {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background: #0f0f0f;
+    border-radius: 15px;
+    border: 1px solid #7a0000;
+}
+
+.steps p {
+    margin: 8px 0;
+}
+
+.pay {
+    background: linear-gradient(90deg, #00c853, #00e676);
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    background: #111;
+    margin-top: 40px;
+    opacity: 0.7;
+}
+
+@media(max-width: 768px) {
+    .bike {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
 
 <header>
     <h1>Gogobike</h1>
-    <p>Аренда электровелосипедов в Лодзи</p>
+    <p>Электровелосипеды в Лодзи</p>
 </header>
 
 <nav>
@@ -91,47 +145,57 @@
     <a href="#rent">Аренда</a>
 </nav>
 
-<div class="container" id="about">
-    <h2>О компании</h2>
-    <p>Gogobike — современный сервис аренды электровелосипедов, основанный в 2023 году в городе Лодзь. Мы создали удобный способ передвижения по городу для жителей и туристов.</p>
-    <p>Наша цель — сделать аренду максимально простой, быстрой и доступной. Мы предлагаем надежные электровелосипеды, которые идеально подходят как для прогулок, так и для повседневных поездок.</p>
-    <p>С Gogobike вы получаете свободу передвижения, комфорт и удовольствие от каждой поездки.</p>
-</div>
-
-<div class="container" id="rent">
-    <h2>Аренда</h2>
-
-    <div class="bike">
-        <img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6" alt="Электровелосипед">
-        <h3>Электровелосипед</h3>
-        <p>30 zł / день</p>
-        <p>210 zł / неделя</p>
-        <button class="btn" onclick="showInfo()">Арендовать</button>
-
-        <div id="rentInfo" class="hidden">
-            <p><strong>Как арендовать:</strong></p>
-            <p>1. Нажмите кнопку оплаты ниже</p>
-            <p>2. Оплатите аренду через BLIK</p>
-            <p>3. Свяжитесь с нами для получения велосипеда</p>
-
-            <p><strong>Телефон:</strong> +48 880 647 127</p>
-            <p><strong>Адрес:</strong> Radwanska 56, Łódź</p>
-
-            <button class="btn pay" onclick="pay()">Оплатить 220 zł (BLIK)</button>
-        </div>
+<section class="section" id="about">
+    <div class="card">
+        <h2>О компании</h2>
+        <p>Gogobike — сервис аренды электровелосипедов, открытый в 2023 году в городе Лодзь.</p>
+        <p>Мы создали удобный и современный способ передвижения по городу — без пробок, без лишних затрат и с максимальным комфортом.</p>
+        <p>Наши велосипеды подходят как для повседневных поездок, так и для прогулок. Просто арендуй и поезжай.</p>
     </div>
+</section>
 
-</div>
+<section class="section" id="rent">
+    <div class="card bike">
+
+        <img src="https://images.unsplash.com/photo-1595433562696-0c0c5b33b7e6" alt="bike">
+
+        <div>
+            <h2>Электровелосипед</h2>
+            <div class="price">30 zł / день</div>
+            <div class="price">210 zł / неделя</div>
+
+            <button class="btn" onclick="showInfo()">Арендовать</button>
+
+            <div id="rentInfo" class="hidden">
+                <div class="steps">
+                    <p><b>Как арендовать:</b></p>
+                    <p>1. Нажмите оплатить</p>
+                    <p>2. Оплатите через BLIK</p>
+                    <p>3. Свяжитесь с нами</p>
+                </div>
+
+                <p><b>Телефон:</b> 880647127</p>
+                <p><b>Адрес:</b> Radwanska 56, Łódź</p>
+
+                <button class="btn pay" onclick="pay()">Оплатить 220 zł</button>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<footer>
+    © 2026 Gogobike
+</footer>
 
 <script>
-    function showInfo() {
-        var info = document.getElementById('rentInfo');
-        info.classList.toggle('hidden');
-    }
+function showInfo() {
+    document.getElementById('rentInfo').classList.toggle('hidden');
+}
 
-    function pay() {
-        alert('Переведите 220 zł через BLIK на номер: 880647127');
-    }
+function pay() {
+    alert('Оплата через BLIK: отправьте 220 zł на номер 880647127');
+}
 </script>
 
 </body>
