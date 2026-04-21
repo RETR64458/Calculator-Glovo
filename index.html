@@ -1,225 +1,89 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gogobike</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Code Generator</title>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-    font-family: 'Inter', sans-serif;
-    background:#000;
-    color:#fff;
-}
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-header{
-    padding:100px 20px;
-    text-align:center;
-    background:linear-gradient(to bottom,#111,#000);
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-header h1{
-    font-size:56px;
-    font-weight:600;
-}
+    .card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      border-radius: 20px;
+      width: 320px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      text-align: center;
+    }
 
-header p{
-    opacity:0.6;
-    margin-top:10px;
-}
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
 
-nav{
-    display:flex;
-    justify-content:center;
-    gap:20px;
-    padding:15px;
-    backdrop-filter: blur(10px);
-    background:rgba(20,20,20,0.7);
-    position:sticky;
-    top:0;
-}
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
 
-nav a{
-    color:#ccc;
-    text-decoration:none;
-    padding:8px 16px;
-    border-radius:20px;
-}
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #6366f1, #22d3ee);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
 
-nav a:hover{
-    background:#222;
-    color:white;
-}
+    button:hover {
+      transform: scale(1.05);
+    }
 
-.section{
-    padding:80px 20px;
-    max-width:1200px;
-    margin:auto;
-}
-
-.title{
-    font-size:32px;
-    margin-bottom:30px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:25px;
-}
-
-.card{
-    background:rgba(255,255,255,0.03);
-    border-radius:25px;
-    padding:20px;
-    backdrop-filter: blur(20px);
-    transition:0.4s;
-}
-
-.card:hover{
-    transform:translateY(-10px);
-    background:rgba(255,255,255,0.06);
-}
-
-.card img{
-    width:100%;
-    border-radius:20px;
-    object-fit:cover;
-}
-
-.bike{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:40px;
-    align-items:center;
-}
-
-.price{
-    font-size:18px;
-    opacity:0.8;
-}
-
-.big{
-    font-size:28px;
-    margin:10px 0;
-}
-
-.btn{
-    background:white;
-    color:black;
-    padding:14px 28px;
-    border-radius:30px;
-    border:none;
-    font-size:16px;
-    cursor:pointer;
-    margin-top:15px;
-    transition:0.3s;
-}
-
-.btn:hover{
-    transform:scale(1.05);
-}
-
-.pay{
-    background:#00ff88;
-    color:black;
-}
-
-.hidden{
-    display:none;
-    margin-top:20px;
-    padding:20px;
-    border-radius:20px;
-    background:rgba(255,255,255,0.05);
-}
-
-footer{
-    text-align:center;
-    padding:40px;
-    opacity:0.5;
-}
-
-@media(max-width:768px){
-    .bike{grid-template-columns:1fr}
-}
-</style>
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #22d3ee;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <h1>🔐 Address → Code</h1>
+    <input id="address" placeholder="Введите адрес..." />
+    <button onclick="generate()">Сгенерировать</button>
+    <div class="result" id="result"></div>
+  </div>
 
-<header>
-<h1>Gogobike</h1>
-<p>Просто арендуй. Просто езжай.</p>
-</header>
+  <script>
+    async function generate() {
+      const address = document.getElementById("address").value;
+      const res = await fetch(`/api/generate?address=${encodeURIComponent(address)}`);
+      const data = await res.json();
 
-<nav>
-<a href="#home">Главная</a>
-<a href="#rent">Аренда</a>
-<a href="#about">О нас</a>
-</nav>
-
-<section class="section" id="home">
-<div class="title">Выбери свой велосипед</div>
-<div class="grid">
-
-<div class="card">
-<img src="https://picsum.photos/400/300?random=1">
-<h3>City E-bike</h3>
-</div>
-
-<div class="card">
-<img src="https://picsum.photos/400/300?random=2">
-<h3>Mountain E-bike</h3>
-</div>
-
-<div class="card">
-<img src="https://picsum.photos/400/300?random=3">
-<h3>Premium E-bike</h3>
-</div>
-
-</div>
-</section>
-
-<section class="section" id="rent">
-<div class="card bike">
-
-<img src="https://picsum.photos/500/400?random=4">
-
-<div>
-<div class="big">Электровелосипед</div>
-<div class="price">30 zł / день</div>
-<div class="price">210 zł / неделя</div>
-
-<button class="btn pay" onclick="pay()">Оплатить 210 zł</button>
-
-<div id="rentInfo" class="hidden">
-<p>Вы оплачиваете 210 злотых за аренду велосипеда на неделю.</p>
-<p>После оплаты свяжитесь: 880647127</p>
-<p>Radwanska 56, Łódź</p>
-</div>
-
-</div>
-</div>
-</section>
-
-<section class="section" id="about">
-<div class="card">
-<div class="title">О компании</div>
-<p>Gogobike — сервис аренды электровелосипедов, основанный в 2023 году в Лодзи.</p>
-<p>Минимализм, скорость и удобство — как в лучших продуктах Apple.</p>
-</div>
-</section>
-
-<footer>© Gogobike</footer>
-
-<script>
-function pay(){
-document.getElementById('rentInfo').classList.remove('hidden');
-alert('Оплата BLIK: 210 zł на номер 880647127');
-}
-</script>
-
+      document.getElementById("result").innerText = data.code || data.error;
+    }
+  </script>
 </body>
 </html>
