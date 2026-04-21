@@ -1,89 +1,154 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Code Generator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: linear-gradient(160deg, #020617, #0f172a);
+  color: white;
+}
 
-    .card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(20px);
-      padding: 30px;
-      border-radius: 20px;
-      width: 320px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-      text-align: center;
-    }
+.app {
+  padding: 20px;
+}
 
-    h1 {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
 
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
+.search {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  color: white;
+  margin-bottom: 15px;
+}
 
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(90deg, #6366f1, #22d3ee);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 18px;
+  padding: 15px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(20px);
+  transition: 0.2s;
+}
 
-    button:hover {
-      transform: scale(1.05);
-    }
+.card:hover {
+  transform: scale(1.02);
+}
 
-    .result {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #22d3ee;
-    }
-  </style>
+.addr {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.code {
+  font-size: 18px;
+  color: #22d3ee;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>🔐 Address → Code</h1>
-    <input id="address" placeholder="Введите адрес..." />
-    <button onclick="generate()">Сгенерировать</button>
-    <div class="result" id="result"></div>
-  </div>
+<div class="app">
+  <div class="title">🔐 Codes</div>
+  <input class="search" id="search" placeholder="Введите адрес..." />
 
-  <script>
-    async function generate() {
-      const address = document.getElementById("address").value;
-      const res = await fetch(`/api/generate?address=${encodeURIComponent(address)}`);
-      const data = await res.json();
+  <div id="list"></div>
+</div>
 
-      document.getElementById("result").innerText = data.code || data.error;
-    }
-  </script>
+<script>
+const DATA = [
+  { addr: "Mielczarskiego 17", codes: ["#1717#"] },
+  { addr: "Adwentowicza 13", codes: ["1k4306"] },
+  { addr: "Kilińskiego 27/29", codes: ["23k3738"] },
+  { addr: "Piotrkowska 44", codes: ["#10078205#", "#10050688#"] }
+];
+
+const list = document.getElementById("list");
+const input = document.getElementById("search");
+
+const history = JSON.parse(localStorage.getItem("history") || "[]");
+const favs = JSON.parse(localStorage.getItem("favs") || "[]");
+
+function normalize(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]/gi, "");
+}
+
+function render(items) {
+  list.innerHTML = items.map(item => `
+    <div class="card">
+      <div class="addr">${item.addr}</div>
+      ${item.codes.map(c => `<div class="code">${c}</div>`).join("")}
+
+      <div class="actions">
+        <div class="btn" onclick="copy('${item.codes[0]}')">📋</div>
+        <div class="btn" onclick="fav('${item.addr}')">⭐</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function search() {
+  const val = normalize(input.value);
+
+  const res = DATA.filter(item =>
+    normalize(item.addr).includes(val)
+  );
+
+  render(res);
+
+  if (val && res.length) {
+    saveHistory(res[0].addr);
+  }
+}
+
+function copy(text) {
+  navigator.clipboard.writeText(text);
+}
+
+function fav(addr) {
+  if (!favs.includes(addr)) {
+    favs.push(addr);
+    localStorage.setItem("favs", JSON.stringify(favs));
+  }
+}
+
+function saveHistory(addr) {
+  if (!history.includes(addr)) {
+    history.unshift(addr);
+    localStorage.setItem("history", JSON.stringify(history));
+  }
+}
+
+input.addEventListener("input", search);
+
+// старт — показываем избранное или всё
+render(DATA);
+</script>
 </body>
 </html>
