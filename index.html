@@ -15,40 +15,53 @@ body {
 }
 
 .app {
-  padding: 20px;
+  padding: 16px;
 }
 
 .title {
   font-size: 22px;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .search {
   width: 100%;
   padding: 14px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
   background: rgba(255,255,255,0.05);
   color: white;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tab {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.active {
+  background: #22d3ee;
+  color: black;
 }
 
 .card {
   background: rgba(255,255,255,0.05);
-  border-radius: 18px;
-  padding: 15px;
-  margin-bottom: 10px;
-  backdrop-filter: blur(20px);
-  transition: 0.2s;
-}
-
-.card:hover {
-  transform: scale(1.02);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 8px;
 }
 
 .addr {
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.7;
 }
 
@@ -58,15 +71,15 @@ body {
 }
 
 .actions {
-  margin-top: 8px;
+  margin-top: 6px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .btn {
   font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 10px;
+  padding: 4px 8px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.08);
   cursor: pointer;
 }
@@ -76,7 +89,14 @@ body {
 <body>
 <div class="app">
   <div class="title">🔐 Codes</div>
-  <input class="search" id="search" placeholder="Введите адрес..." />
+
+  <input id="search" class="search" placeholder="Введите адрес..." />
+
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('all')">Все</div>
+    <div class="tab" onclick="setTab('fav')">⭐ Избранное</div>
+    <div class="tab" onclick="setTab('history')">🕘 История</div>
+  </div>
 
   <div id="list"></div>
 </div>
@@ -86,20 +106,36 @@ const DATA = [
   { addr: "Mielczarskiego 17", codes: ["#1717#"] },
   { addr: "Adwentowicza 13", codes: ["1k4306"] },
   { addr: "Kilińskiego 27/29", codes: ["23k3738"] },
-  { addr: "Piotrkowska 44", codes: ["#10078205#", "#10050688#"] }
+  { addr: "Piotrkowska 44", codes: ["#10078205#", "#10050688#"] },
+  { addr: "Wschodnia 63", codes: ["#1510#", "#21050011#"] },
+  { addr: "Wodna 23a", codes: ["255k9999", "1019k3097", "1012k5189"] },
+  { addr: "Gdańska 22", codes: ["#1111#"] },
+  { addr: "Żeligowskiego 42", codes: ["29k2601"] },
+  { addr: "Uniwersytecka 29", codes: ["64k8074"] },
+  { addr: "Armii Krajowej 60", codes: ["22*3312"] },
+  { addr: "Kopernika 64b", codes: ["5k6951"] },
+  { addr: "Jaracza 72A", codes: ["6768#"] },
+  { addr: "Łąkowa 27c", codes: ["k3593k", "93kv"] }
 ];
+
+let currentTab = "all";
 
 const list = document.getElementById("list");
 const input = document.getElementById("search");
 
-const history = JSON.parse(localStorage.getItem("history") || "[]");
-const favs = JSON.parse(localStorage.getItem("favs") || "[]");
+let favs = JSON.parse(localStorage.getItem("favs") || "[]");
+let history = JSON.parse(localStorage.getItem("history") || "[]");
 
 function normalize(str) {
   return str.toLowerCase().replace(/[^a-z0-9]/gi, "");
 }
 
 function render(items) {
+  if (!items.length) {
+    list.innerHTML = "Ничего не найдено";
+    return;
+  }
+
   list.innerHTML = items.map(item => `
     <div class="card">
       <div class="addr">${item.addr}</div>
@@ -107,7 +143,9 @@ function render(items) {
 
       <div class="actions">
         <div class="btn" onclick="copy('${item.codes[0]}')">📋</div>
-        <div class="btn" onclick="fav('${item.addr}')">⭐</div>
+        <div class="btn" onclick="toggleFav('${item.addr}')">
+          ${favs.includes(item.addr) ? "★" : "☆"}
+        </div>
       </div>
     </div>
   `).join("");
@@ -116,14 +154,51 @@ function render(items) {
 function search() {
   const val = normalize(input.value);
 
-  const res = DATA.filter(item =>
+  let result = DATA.filter(item =>
     normalize(item.addr).includes(val)
   );
 
-  render(res);
+  if (val && result.length) {
+    saveHistory(result[0].addr);
+  }
 
-  if (val && res.length) {
-    saveHistory(res[0].addr);
+  render(result);
+}
+
+function setTab(tab) {
+  currentTab = tab;
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
+
+  if (tab === "all") render(DATA);
+
+  if (tab === "fav") {
+    const items = DATA.filter(d => favs.includes(d.addr));
+    render(items);
+  }
+
+  if (tab === "history") {
+    const items = DATA.filter(d => history.includes(d.addr));
+    render(items);
+  }
+}
+
+function toggleFav(addr) {
+  if (favs.includes(addr)) {
+    favs = favs.filter(a => a !== addr);
+  } else {
+    favs.push(addr);
+  }
+  localStorage.setItem("favs", JSON.stringify(favs));
+  setTab(currentTab);
+}
+
+function saveHistory(addr) {
+  if (!history.includes(addr)) {
+    history.unshift(addr);
+    history = history.slice(0, 10);
+    localStorage.setItem("history", JSON.stringify(history));
   }
 }
 
@@ -131,23 +206,9 @@ function copy(text) {
   navigator.clipboard.writeText(text);
 }
 
-function fav(addr) {
-  if (!favs.includes(addr)) {
-    favs.push(addr);
-    localStorage.setItem("favs", JSON.stringify(favs));
-  }
-}
-
-function saveHistory(addr) {
-  if (!history.includes(addr)) {
-    history.unshift(addr);
-    localStorage.setItem("history", JSON.stringify(history));
-  }
-}
-
 input.addEventListener("input", search);
 
-// старт — показываем избранное или всё
+// старт
 render(DATA);
 </script>
 </body>
